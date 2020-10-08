@@ -1,0 +1,87 @@
+07.链表
+https://leetcode-cn.com/problems/reverse-linked-list/
+206. 反转链表
+反转一个单链表。
+
+示例:
+
+输入: 1->2->3->4->5->NULL
+输出: 5->4->3->2->1->NULL
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        
+        if(head==null || head.next==null){
+        		return head;
+        }
+
+        ListNode cur = reverseList(head.next);
+        head.next.next = head;
+        head.next = null;
+
+        return cur;
+
+    }
+}
+
+解释 https://leetcode-cn.com/problems/reverse-linked-list/solution/dong-hua-yan-shi-206-fan-zhuan-lian-biao-by-user74/
+
+head == 1
+reverseList(1)把1带进去 --> reverseList(2)---> 
+reverseList(3)--->reverseList(4)--->reverseList(5)
+
+
+reverseList(5)=5
+此时head=4
+所以
+
+ListNode cur = 5;
+4.next.next = 4  就是5.next=4;
+4.next = null 断开
+这时返回cur=5 所以reverseList(4)=5
+然后就是reverseList(3)
+3.next.next = 3
+4.next = 3  
+3.next = null;
+依次类推 链表被反转了，返回的cur指向节点5
+ 5->4->3->2->1->NULL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
