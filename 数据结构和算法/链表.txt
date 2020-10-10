@@ -53,6 +53,52 @@ ListNode cur = 5;
 3.next = null;
 依次类推 链表被反转了，返回的cur指向节点5
  5->4->3->2->1->NULL
+141.环形链表
+https://leetcode-cn.com/problems/linked-list-cycle/
+方法一：哈希表
+最容易想到的方法就是遍历所有的节点，判断这个节点是否访问过
+所以我们可以使用哈希表用来存储所有已经访问过的节点，遍历所有的节点，当节点已经存在在哈希表中，证明这个链表存在环路
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+       Set(ListNode) seen = new HashSet(ListNode);
+       while(head!=null){
+       	  if(!seen.add(head)){
+       	  	 return true;
+       	  }	
+       	  seen.add(head);
+       }
+       retrun false;
+
+    }
+}
+方法二：快慢指针解法
+假设有两个指针，一快一慢，如果链表存在环路，快指针一定会赶上慢指针，两个指针早晚会重合
+public class Solution{
+	public boolean hasCycle(ListNode head){
+		if(head==null || head.next==null){
+			return false;
+		}
+		//定义两个指针i和j，i是慢指针，j是快指针
+		ListNode i = head;
+		ListNode j = head.next;
+		while(j!=null && j.next!=null){
+			if(i==j){
+				return true;
+			}
+			//i每次走一步，j每次走两步
+			i = i.next;
+			j = j.next.next;
+		}
+		return false;
+
+	}
+
+}
+
+
+
+
+
 
 
 
