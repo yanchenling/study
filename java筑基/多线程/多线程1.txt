@@ -1,0 +1,229 @@
+基础概念:
+CPU核心数和线程数的关系 1:1
+4核表示 同时可以运行4个线程
+使用超线程技术（1：2）4核可以运行8个线程
+我们平时开发的时候，并没有感觉到cpu核心数的限制，想启动线程就启动线程，这是因为操作系统提供了一种CPU时间片轮转机制，时间片轮转调度是一种最古老、最简单、最公平且使用最广的算法，又称RR调度，每个进程被分配一个时间段，称作它的时间片，即该进程允许运行的时间。
+
+什么是进程和线程？
+进程大于线程
+进程：是程序运行资源分配的最小单位
+进程是操作系统进行资源分配的最小单位，其中资源包括：CPU、内存空间、磁盘等，同一进程中的多条线程共享该进程中的全部系统资源，而进程和进程之间是相互独立的，进程是具有一定独立功能的程序关于某个数据集合上的一次运行活动，进程是系统进行资源分配和调度的一个独立单位。
+进程是程序在计算机上的一次执行活动，当你运行一个程序，你就启动了一个进程，显然，程序是死的、静态的，进程是活的、动态的，进程可以分为系统进程和用户进程，凡是用于完成操作系统的各种功能的进程就是系统进程，他们就是处于运行状态下的操作系统本身，用户进程就是所有由你启动的进程。
+线程是cpu调度的最小单位，必须依赖于进程而存在
+ 	线程是进程的一个实体，是cpu调度和分派的基本单位，它是比进程更小的、能独立运行的基本单位，线程自己基本上不拥有系统资源，只拥有一点在运行中比不可少的资源，但是它可与同属一个进程的其他线程共享所拥有的全部资源。
+
+进程和CPU没有任何关系
+线程是CPU调度的最小单位
+
+一个进程至少包含一个线程
+如果一个进程，还有一个线程没有杀掉，进程还存活。
+
+进程A{线程一，线程二，线程三}
+进程B{线程一}
+进程C{ }  挂了
+
+并行和并发
+我们举个例子,如果有条高速公路A上面并排有8条车道,那么最大的并行车辆就是8辆此条高速公路A同时并排行走的车辆小于等于8辆的时候,车辆就可以并行运行。CPU也是这个原理,一个CPU相当于一个高速公路A,核心数或者线程数就相当于并排可以通行的车道;而多个CPU就相当于并排有多条高速公路,而每个高速公路并排有多个车道
+当谈论并发的时候一定要加个单位时间，也就是说单位时间内并发量是多少？离开了单位时间其实是没有意义的。
+俗话说,一心不能二用,这对计算机也一样,原则上一个CPU只能分配给一个进程,以便运行这个进程。我们通常使用的计算机中只有一个CPU,也就是说只有一颗心,要让它一心多用同时运行多个进程,就必须使用并发技术。实现并发技术相当复杂,最容易理解的是“时间片轮转进程调度算法”
+并发：指应用能够交替执行不同的任务，比如单CPU核心下执行多线程并非是同时执行多个任务，如果你开两个线程执行，就是在你几乎不可能察觉到的速度不断去切换着两个任务，已达到"同时执行效果"，其实并不是的，知识计算机的速度太快，我们无法察觉到而已。
+并行：只应用能够同时执行不同的任务，例：吃饭的时候可以边吃饭边打电话，这两件事可以同时执行。
+两者区别：一个是交替执行，一个是同时执行。
+
+高并发编程的意义、好处和注意事项
+(1)充分利用CPU的资源
+(2)加快响应用户的时间
+(3)可以是你的代码模块化，异步化，简单化
+
+多线程程序需要注意事项
+（1）线程之间的安全性
+从前面的内容讲述中我们知道，在同一个进程里面的多进程是资源共享的，也就是的都可以访问同一个内存地址当中的一个变量。例如；若每个线程中对全局变量、静态变量只有读操作，而无写操作，一般来说，这个全局变量是线程安全的；若有多个线程同时执行写操作，一般都需要考虑线程同步，否则就可能影响线程安全。
+(2) 线程之间的死循环过程
+为了解决线程之间的安全性引入了Java的锁机制，而不一小心就会产生Java线程死锁的多线程问题，因为不同的线程都在等待那些不可能被释放的锁，从而导致所有的工作都无法完成。假设有两个线程,分别代表两个饥饿的人,他们必须共享刀叉并轮流吃饭。他们都需要获得两个锁:共享刀和共享叉的锁。
+假如线程A获得了刀,而线程B获得了叉。线程A就会进入阻塞状态来等待获得叉,而线程B则阻塞来等待线程A所拥有的刀。这只是人为设计的例子,但尽管在运行时很难探测到,这类情况却时常发生
+(3)线程太多了会将服务器资源耗尽形成死机宕机
+线程数太多有可能造成系统创建大量线程而导致消耗完系统内存以及CPU的“过渡切换”,造成系统的死机,那么我们该如何解决这类问题呢?
+某些系统资源是有限的,如文件描述符。多线程程序可能耗尽资源,因为每个线程都可能希望有一个这样的资源。如果线程数相当大,或者某个资源的侯选线程数远远超过了可用的资源数则最好使用资源池。一个最好的示例是数据库连接池。只要线程需要使用一个数据库连接,它就从池中取出一个,使用以后再将它返回池中。资源池也称为资源库。这里先有一个概念,后面会
+多线程应用开发的注意事项很多,希望大家在日后的工作中可以慢慢体会它的危险所在。
+
+Java里的程序天生就是多线程的，那么有几种新启线程的方式？
+几种启动线程的方式
+3种方式，其实2和3可以归为一种都是交给Thread去执行
+1)继承类Thread,覆盖run方法
+
+class UseThread extends Thread{
+@Override
+public void run(){
+super.run();
+//do my work
+System.out.println("I am extends Thread")
+}
+}
+使用
+UseThread useThread = new UseThread();
+useThread.start();
+
+2实现Runnable接口,交给Thread运行
+
+class UseRun implements Runnable{
+
+@Override
+public void run(){
+System.out.println("I am implements Runnable");
+}
+}
+使用
+
+UseRun useRun = new UseRun();
+new Thread(useRun).start();
+
+3)实现Callable接口，交给Thread运行，允许有返回值
+
+class UseCall implements Callable<String>{
+
+@Override
+public String call() throws Exception{
+System.out.println("I am implements Callable);
+return "CallResult";
+}
+}
+使用
+UseCall useCall = new UseCall();
+FutureTask<String> futureTask = new FutureTask<>(useCall);
+new Thread(futureTask).start();
+System.out.println(futureTask.get());
+
+
+
+Thread是对线程的抽象 唯一代表线程
+Runable和Callable是对任务的抽象
+
+中止
+线程自然终止，要么是run执行完成了，要么是抛出了一个未处理的异常导致线程提前结束。
+手动中止
+暂停、恢复和停止操作对应在线程Thread的API就是suspend()、resume()和stop()
+但是这些API是过期的，也就是不建议使用的，不建议使用的原因主要有:以suspend()方法为例，在调用后，线程不会释放已经占有的资源(比如锁),而是占有着资源进入睡眠状态，这样容易引发死锁问题，同样，stop()方法在终结一个线程时不会保证线程的资源正常释放，通常是没有给予线程资源释放工作的机会，因此会导致程序可能工作在不确定状态下，正因为suspend()、resume()和stop()方法带来的副作用，这些方法才被标注为不建议使用的过期方法。
+安全的中止则是其它线程通过调用某个线程A的interrupt()方法对其进行中断操作，中断好比其他线程对该线程打了个招呼，"A ,你要中断了"，不代表线程A会立即停止自己的工作，同样的A线程完成可以不理会这种中断请求，因为java里的线程是协作式的，不是抢占式的，线程通过检查自身的中断标志位是否被置为true来进行响应，线程通过方法isInterrupted()来进行判断是否被中断，也可以调用静态方法Thread.interrupted()来进行判断当前线程是否被中断，不过Thread.interrupted()会同时将中断标识改写为false
+如果一个线程处于了阻塞状态(如线程调用了thread.sleep、thread.join、thread.wait),则在线程在检查中断标示时如果发现中断标识为true，则会在这些阻塞方法调用处抛出interruptedException异常，并且在抛出异常后会立即将线程的中断标识位清楚，既重新设置为false
+不建议自定义一个取消标志位来中止线程的运行。因为run方法里有阻塞调用时会无法很快检测到取消标志，线程必须从阻塞调用返回后，才会检查这个取消标志。这种情况下，使用中断会更好，因为，一、一般的阻塞方法，如sleep等本身就支持中断的检查，二、检查中断位的状态和检查取消标志位没什么区别，用中断位的状态还可以避免声明取消标志位，减少资源的消耗。
+注意：处于死锁状态的线程无法被中断
+
+
+有开始就有结束,怎么样才能让java里的线程安全停止工作呢？
+stop()还是interrupt()、isInterrupted()、static方法interrupted(),深入理解这些方法
+isInterrupted用的更多
+一个线程内的方法执行完成，这个线程就完成了
+还有就是手动去结束线程
+stop、过时了，不要去用了
+suspend 容易引发死锁问题
+
+终止线程的方法
+interrupt 中断线程 协作式 
+interrupted 判断是否中断
+Thread.interrupted()
+把这个标志位有true改为false
+public class EndThread {
+	
+	private static class UseThread extends Thread{
+		
+		public UseThread(String name) {
+			super(name);
+		}
+		
+		@Override
+		public void run() {
+			String threadName = Thread.currentThread().getName();
+			System.out.println(threadName+" interrrupt flag ="+isInterrupted());
+			//while(!isInterrupted()){
+			while(!Thread.interrupted()){
+			//while(true){
+				System.out.println(threadName+" is running");
+				System.out.println(threadName+"inner interrrupt flag ="+isInterrupted());
+			}
+			System.out.println(threadName+" interrrupt flag ="+isInterrupted());
+		}
+	}
+
+	public static void main(String[] args) throws InterruptedException {
+		Thread endThread = new UseThread("endThread");
+		endThread.start();
+		Thread.sleep(10);
+		endThread.interrupt();
+
+	}
+
+}
+
+深入理解run()和start()
+Thread类是Java里对线程概念的抽象，可以这样理解,我们通过new Thead()其实只是new出一个Thread的实例，还没有操作系统中真正的线程挂钩来，只有执行了start()方法后，才实现了真正意义上的启动线程。
+start()方法让一个线程进入就绪队列等待分配cpu，分到cpu后才调用实现的run()方法，start()方法不能重复调用。
+而run方法是业务逻辑实现的地方，本质上和任意一个类的任意一个成员方法没有任何区别，可以重复执行，可以被单独调用。
+
+
+run和start的区别？
+run只是普通的函数调用 和线程没有任何关系
+.start会走底层 会走系统层 最终调度到 run函数 这才是启动线程
+
+只有执行了start方法才在操作系统开启线程
+同时调用两次start会报错的
+public class StartAndRun {
+    public static class ThreadRun extends Thread{
+
+        @Override
+        public void run() {
+            int i = 90;
+            while(i>0){
+            	SleepTools.ms(1000);
+                System.out.println("I am "+Thread.currentThread().getName()
+                		+" and now the i="+i--);
+            }
+        }
+    }
+    
+    private static class User {
+    	public void us() {
+    		
+    	}
+    }
+
+    public static void main(String[] args) {
+        ThreadRun beCalled = new ThreadRun();
+        beCalled.setName("beCalled");
+        //beCalled.run();
+
+        new User().us();
+
+        beCalled.start();
+    }
+}
+
+如何控制线程的顺序？
+用join来控制，让t2获取执行权力，能够做到顺序执行
+
+在jdk里面能不能强制终止一个线程？
+能终止，stop已经废弃了，不推荐使用
+可以使用 interrupt()中断线程，但是在java线程是协作式任务，所有interrupt不代表一定会中断，具体会不会中断完全由线程本身来决定
+
+sleep和wait有什么区别
+sleep是指线程的休眠
+wait当前的线程有什么条件不满足，让线程进入wait，当线程所需要的资源满足了，使用notify把它唤醒
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
